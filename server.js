@@ -77,7 +77,7 @@ app.post("/create-payment", async (req, res) => {
             product_data: {
               name: "100 CarWash Credits"
             },
-            unit_amount: 10 // 1 евро
+            unit_amount: 50 // 1 евро
           },
           quantity: 1
         }
