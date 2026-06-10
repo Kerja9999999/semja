@@ -78,7 +78,7 @@ const session = await stripe.checkout.sessions.create({
         product_data: {
           name: "100 CarWash Credits"
         },
-        unit_amount: 50
+        unit_amount: 100
       },
       quantity: 1
     }
@@ -162,7 +162,9 @@ await supabase
     }
   ]);
 
-return res.send("Оплата успешна. Начислено 100 кредитов.");
+return res.send(
+  `Оплата успешна! Пользователю ${phone} начислено 100 кредитов. Теперь кредитов: ${newCredits}`
+);
 ```
 
 } catch (error) {
@@ -177,5 +179,5 @@ res.send("Оплата отменена");
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-console.log("Server started on " + PORT);
+console.log(`Server started on ${PORT}`);
 });
