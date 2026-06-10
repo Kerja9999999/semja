@@ -149,7 +149,14 @@ if (existingPayment) {
     if (error) {
       return res.status(500).send(error.message);
     }
-
+await supabase
+  .from("payments")
+  .insert([
+    {
+      stripe_payment_id: sessionId,
+      amount: 1
+    }
+  ]);
     res.send(
       `Оплата успешна! Пользователю ${phone} начислено 100 кредитов. Теперь кредитов: ${newCredits}`
     );
