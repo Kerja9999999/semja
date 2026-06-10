@@ -70,27 +70,23 @@ const { phone } = req.body;
 const session = await stripe.checkout.sessions.create({
   payment_method_types: ["card"],
   mode: "payment",
-
   line_items: [
     {
       price_data: {
         currency: "eur",
         product_data: {
-          name: "100 CarWash Credits"
+          name: "TEST - 100 CarWash Credits"
         },
         unit_amount: 100
       },
       quantity: 1
     }
   ],
-
   metadata: {
     phone: phone
   },
-
   success_url:
     "https://carwash-server-x53y.onrender.com/payment-success?session_id={CHECKOUT_SESSION_ID}",
-
   cancel_url:
     "https://carwash-server-x53y.onrender.com/payment-cancel"
 });
@@ -112,21 +108,24 @@ try {
 const sessionId = req.query.session_id;
 
 ```
-const session = await stripe.checkout.sessions.retrieve(sessionId);
+const session =
+  await stripe.checkout.sessions.retrieve(sessionId);
 
 const phone = session.metadata.phone;
 
-const { data: user, error: userError } = await supabase
-  .from("users")
-  .select("*")
-  .eq("phone", phone)
-  .single();
+const { data: user, error: userError } =
+  await supabase
+    .from("users")
+    .select("*")
+    .eq("phone", phone)
+    .single();
 
 if (userError || !user) {
   return res.send("Пользователь не найден");
 }
 
-const newCredits = (user.credits || 0) + 100;
+const currentCredits = user.credits || 0;
+const newCredits = currentCredits + 100;
 
 const { error } = await supabase
   .from("users")
@@ -139,13 +138,11 @@ if (error) {
   return res.status(500).send(error.message);
 }
 
-res.send(
-  `Оплата успешна! Пользователю ${phone} начислено 100 кредитов. Теперь всего кредитов: ${newCredits}`
-);
+return res.send("Оплата успешна. Начислено 100 кредитов.");
 ```
 
 } catch (error) {
-res.status(500).send(error.message);
+return res.status(500).send(error.message);
 }
 });
 
