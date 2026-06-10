@@ -78,7 +78,7 @@ const session = await stripe.checkout.sessions.create({
         product_data: {
           name: "100 CarWash Credits"
         },
-        unit_amount: 100
+        unit_amount: 1000
       },
       quantity: 1
     }
