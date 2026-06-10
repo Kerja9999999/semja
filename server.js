@@ -77,7 +77,7 @@ app.post("/create-payment", async (req, res) => {
             product_data: {
               name: "100 CarWash Credits"
             },
-            unit_amount: 100
+            unit_amount: 100 // 1 евро
           },
           quantity: 1
         }
@@ -102,6 +102,50 @@ app.post("/create-payment", async (req, res) => {
     res.status(500).json({
       error: error.message
     });
+  }
+});
+
+app.get("/payment-success", async (req, res) => {
+  try {
+    const sessionId = req.query.session_id;
+
+    if (!sessionId) {
+      return res.send("Нет session_id");
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    const phone = session.metadata.phone;
+
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("phone", phone)
+      .single();
+
+    if (userError || !user) {
+      return res.send("Пользователь не найден");
+    }
+
+    const newCredits = (user.credits || 0) + 100;
+
+    const { error } = await supabase
+      .from("users")
+      .update({
+        credits: newCredits
+      })
+      .eq("phone", phone);
+
+    if (error) {
+      return res.status(500).send(error.message);
+    }
+
+    res.send(
+      `Оплата успешна! Пользователю ${phone} начислено 100 кредитов. Теперь кредитов: ${newCredits}`
+    );
+
+  } catch (error) {
+    res.status(500).send(error.message);
   }
 });
 
