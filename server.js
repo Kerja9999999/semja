@@ -162,9 +162,7 @@ await supabase
     }
   ]);
 
-return res.send(
-  `Оплата успешна! Пользователю ${phone} начислено 100 кредитов. Теперь кредитов: ${newCredits}`
-);
+return res.send("Оплата успешна! Начислено 100 кредитов.");
 ```
 
 } catch (error) {
