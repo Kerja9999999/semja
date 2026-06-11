@@ -374,6 +374,39 @@ app.get("/test-topup", async (req, res) => {
 
   }
 });
+app.get("/buy-test", async (req, res) => {
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+
+    line_items: [
+      {
+        price_data: {
+          currency: "eur",
+          product_data: {
+            name: "100 CarWash Credits"
+          },
+          unit_amount: 100
+        },
+        quantity: 1
+      }
+    ],
+
+    metadata: {
+      phone: "26245562"
+    },
+
+    success_url:
+      "https://carwash-server-x53y.onrender.com/payment-success?session_id={CHECKOUT_SESSION_ID}",
+
+    cancel_url:
+      "https://carwash-server-x53y.onrender.com/payment-cancel"
+  });
+
+  res.redirect(session.url);
+
+});
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
