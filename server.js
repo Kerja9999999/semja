@@ -1,4 +1,4 @@
-izmeni sam const express = require("express");
+const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 const Stripe = require("stripe");
 const axios = require("axios");
