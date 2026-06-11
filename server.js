@@ -109,9 +109,9 @@ error: error.message
 
 app.get("/payment-success", async (req, res) => {
   try {
-
-    const sessionId = req.query.session_id;
 console.log("PAYMENT SUCCESS ROUTE HIT");
+    const sessionId = req.query.session_id;
+    console.log("SESSION:", sessionId);
     if (!sessionId) {
       return res.send("Нет session_id");
     }
