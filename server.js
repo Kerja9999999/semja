@@ -118,17 +118,21 @@ app.get("/payment-success", async (req, res) => {
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
+    // ЗАЩИТА ОТ ПОВТОРНОГО НАЧИСЛЕНИЯ
+
     const { data: existingPayment } = await supabase
       .from("payments")
       .select("*")
       .eq("stripe_payment_id", sessionId)
-      .single();
+      .maybeSingle();
 
     if (existingPayment) {
       return res.send("Кредиты уже были начислены");
     }
 
     const phone = session.metadata.phone;
+
+    // ИЩЕМ ПОЛЬЗОВАТЕЛЯ В AWOARA
 
     const userResponse = await axios.get(
       "https://en.awoara.com.cn/mer/user/lst?page=1&limit=9999",
@@ -149,17 +153,10 @@ app.get("/payment-success", async (req, res) => {
     if (!awoaraUser) {
       return res.send("Пользователь AWOARA не найден");
     }
-const { data: existingPayment } = await supabase
-  .from("payments")
-  .select("*")
-  .eq("stripe_payment_id", sessionId)
-  .maybeSingle();
 
-if (existingPayment) {
-  return res.send("Кредиты уже начислены");
-}
+    // НАЧИСЛЯЕМ 100 КРЕДИТОВ В AWOARA
+
     await axios.post(
-      
       `https://en.awoara.com.cn/mer/user/change_now_money/${awoaraUser.uid}.html`,
       {
         money_type: 1,
@@ -174,6 +171,33 @@ if (existingPayment) {
         }
       }
     );
+
+    // СОХРАНЯЕМ ОПЛАТУ
+
+    await supabase
+      .from("payments")
+      .insert([
+        {
+          stripe_payment_id: sessionId,
+          phone: phone,
+          uid: awoaraUser.uid,
+          amount: 1
+        }
+      ]);
+
+    return res.send(
+      `Оплата успешна. Пользователь ${phone} получил 100 кредитов.`
+    );
+
+  } catch (error) {
+
+    return res.status(500).send(
+      error.response?.data?.message ||
+      error.message
+    );
+
+  }
+});
 await supabase
   .from("payments")
   .insert([
