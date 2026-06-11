@@ -192,9 +192,9 @@ const { data, error } = await supabase
   ]);
 
 
-    return res.send(
-      `Оплата успешна. Пользователь ${phone} получил 100 кредитов.`
-    );
+return res.send(
+  `Оплата успешна. Пользователь ${phone} получил ${session.metadata.credits} кредитов.`
+);
 
   } catch (error) {
 
