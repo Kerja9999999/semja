@@ -162,7 +162,7 @@ console.log("PAYMENT SUCCESS ROUTE HIT");
       {
         money_type: 1,
         type: 1,
-        now_money: 100,
+        now_money: Number(session.metadata.credits),
         mark: "Stripe payment"
       },
       {
