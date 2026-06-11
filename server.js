@@ -247,6 +247,53 @@ app.get("/awoara-add-test", async (req, res) => {
 
   }
 });
+app.get("/awoara-users", async (req, res) => {
+  ...
+});
+
+app.get("/awoara-find/:phone", async (req, res) => {
+  try {
+
+    const phone = req.params.phone;
+
+    const response = await axios.get(
+      "https://en.awoara.com.cn/mer/user/lst?page=1&limit=9999",
+      {
+        headers: {
+          "x-token": process.env.AWOARA_TOKEN,
+          "Cookie": process.env.AWOARA_COOKIE
+        }
+      }
+    );
+
+    const users = response.data.data.list;
+
+    const user = users.find(
+      u => String(u.phone) === String(phone)
+    );
+
+    if (!user) {
+      return res.json({
+        found: false
+      });
+    }
+
+    res.json({
+      found: true,
+      uid: user.uid,
+      phone: user.phone,
+      nickname: user.nickname
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      error: error.message
+    });
+
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
