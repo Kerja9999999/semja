@@ -1,9 +1,11 @@
+npm install cors
+const cors = require("cors");
 const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 const Stripe = require("stripe");
 const axios = require("axios");
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 
 const supabase = createClient(
