@@ -14,6 +14,23 @@ process.env.SUPABASE_ANON_KEY
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+
+async function sendTelegramMessage(text) {
+  try {
+    await axios.post(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        chat_id: process.env.TELEGRAM_CHAT_ID,
+        text,
+        parse_mode: "HTML"
+      }
+    );
+  } catch (error) {
+    console.error("Telegram error:", error.response?.data || error.message);
+  }
+}
+
+
 app.get("/", (req, res) => {
 res.send("CarWash API работает");
 });
@@ -181,6 +198,16 @@ app.get("/payment-success", async (req, res) => {
         }
       ]);
 
+    await sendTelegramMessage(
+`💰 <b>Новая оплата Stripe</b>
+
+💶 <b>Сумма:</b> €${(session.amount_total / 100).toFixed(2)}
+📱 <b>Телефон:</b> ${phone}
+🎁 <b>Кредитов:</b> ${credits}
+🆔 <b>UID:</b> ${awoaraUser.uid}
+🕒 ${new Date().toLocaleString("lv-LV")}`
+    );
+
     return res.send(
       `Оплата успешна. Пользователь ${phone} получил ${credits} кредитов.`
     );
@@ -271,9 +298,6 @@ app.get("/awoara-add-test", async (req, res) => {
     });
 
   }
-});
-app.get("/awoara-users", async (req, res) => {
-
 });
 
 app.get("/awoara-find/:phone", async (req, res) => {
