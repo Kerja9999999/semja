@@ -23,7 +23,22 @@ bot.onText(/\/start/, (msg) => {
     menu
   );
 });
+bot.on("message", (msg) => {
 
+    if (msg.text === "💰 Добавить расход") {
+
+        userStates[msg.chat.id] = {
+            step: "category"
+        };
+
+        return bot.sendMessage(
+            msg.chat.id,
+            "Выберите категорию расхода:",
+            expenseCategories
+        );
+    }
+
+});
 app.listen(PORT, () => {
   console.log(`🚀 Server started on ${PORT}`);
 });
