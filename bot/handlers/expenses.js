@@ -9,6 +9,15 @@ module.exports = function (bot) {
 
         const chatId = msg.chat.id;
         const text = msg.text;
+        if (text === "❌ Отмена") {
+    delete states[chatId];
+
+    return bot.sendMessage(
+        chatId,
+        "❌ Действие отменено.",
+        menu
+    );
+}
 
         // Кнопка "Добавить расход"
         if (text === "💰 Добавить расход") {
