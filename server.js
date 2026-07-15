@@ -1,4 +1,6 @@
 require("dotenv").config();
+const userStates = require("./bot/states");
+const expenseCategories = require("./bot/categories");
 const menu = require("./bot/menu");
 const express = require("express");
 const TelegramBot = require("node-telegram-bot-api");
