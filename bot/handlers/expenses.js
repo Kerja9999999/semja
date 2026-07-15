@@ -39,19 +39,18 @@ module.exports = function (bot) {
             return bot.sendMessage(chatId, "💶 Введите сумму:");
         }
 
-        // Ввод суммы
-        if (states[chatId].step === "amount") {
+      // Ввод суммы
+if (states[chatId].step === "amount") {
 
-            if (isNaN(text.replace(",", "."))) {
-                return bot.sendMessage(chatId, "Введите число.");
-            }
+    console.log("Получено:", JSON.stringify(text));
 
-            states[chatId].amount = Number(text.replace(",", "."));
-            states[chatId].step = "description";
+    // Временно отключаем проверку
+    states[chatId].amount = text;
 
-            return bot.sendMessage(chatId, "📝 Введите описание:");
-        }
+    states[chatId].step = "description";
 
+    return bot.sendMessage(chatId, "📝 Введите описание:");
+}
         // Ввод описания
         if (states[chatId].step === "description") {
 
