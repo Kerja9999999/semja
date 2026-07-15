@@ -31,13 +31,14 @@ module.exports = function (bot) {
         if (!states[chatId]) return;
 
         // Выбор категории
-        if (states[chatId].step === "category") {
+if (states[chatId].step === "category") {
 
-            states[chatId].category = text;
-            states[chatId].step = "amount";
+    states[chatId].category = text;
+    states[chatId].step = "amount";
 
-            return bot.sendMessage(chatId, "💶 Введите сумму:");
-        }
+    bot.sendMessage(chatId, "💶 Введите сумму:");
+    return;
+}
 
       // Ввод суммы
 if (states[chatId].step === "amount") {
