@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+const menu = require("./bot/menu");
 const express = require("express");
 const TelegramBot = require("node-telegram-bot-api");
 
@@ -15,7 +15,11 @@ app.get("/", (req, res) => {
 });
 
 bot.onText(/\/start/, (msg) => {
-  bot.sendMessage(msg.chat.id, "🏠 Добро пожаловать в Семейный бюджет!");
+  bot.sendMessage(
+    msg.chat.id,
+    "🏠 Семейный бюджет\n\nВыберите действие:",
+    menu
+  );
 });
 
 app.listen(PORT, () => {
