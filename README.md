@@ -1,2 +1,1 @@
-# carwash-server
-carwash server
+Run: npm install && npm start
