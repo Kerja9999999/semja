@@ -1,27 +1,109 @@
-const path = require("path");
-const { load, save } = require("./storage");
+const states = require("../states");
+const categories = require("../keyboards/categories");
+const menu = require("../keyboards/menu");
+const { addExpense } = require("../../services/expenseService");
 
-const FILE = path.join(__dirname, "../data/expenses.json");
+module.exports = function (bot) {
 
-function addExpense(chatId, category, amount, description) {
-    const expenses = load(FILE);
+    bot.on("message", (msg) => {
 
-    const expense = {
-        id: Date.now(),
-        chatId,
-        category,
-        amount: Number(amount),
-        description,
-        date: new Date().toISOString()
-    };
+        const chatId = msg.chat.id;
+        const text = (msg.text || "").trim();
 
-    expenses.push(expense);
+        // Игнорируем /start
+        if (text === "/start") return;
 
-    save(FILE, expenses);
+        // Отмена
+        if (text === "❌ Отмена") {
+            delete states[chatId];
+            return bot.sendMessage(chatId, "❌ Действие отменено.", menu);
+        }
 
-    return expense;
-}
+        // Начало добавления расхода
+        if (text === "💰 Добавить расход") {
+            states[chatId] = {
+                step: "category"
+            };
 
-module.exports = {
-    addExpense
+            return bot.sendMessage(
+                chatId,
+                "Выберите категорию:",
+                categories
+            );
+        }
+
+        // Если пользователь ничего не добавляет
+        if (!states[chatId]) return;
+
+        switch (states[chatId].step) {
+
+            case "category":
+
+                states[chatId].category = text;
+                states[chatId].step = "amount";
+
+                console.log("CATEGORY OK");
+
+                return bot.sendMessage(
+                    chatId,
+                    "💶 Введите сумму:"
+                );
+
+            case "amount":
+
+                console.log("AMOUNT =", text);
+
+                const amount = parseFloat(
+                    text.replace(",", ".")
+                );
+
+                if (Number.isNaN(amount)) {
+                    return bot.sendMessage(
+                        chatId,
+                        "❌ Введите только число.\nНапример:\n20\nили\n20.50"
+                    );
+                }
+
+                states[chatId].amount = amount;
+                states[chatId].step = "description";
+
+                console.log("AMOUNT OK");
+
+                return bot.sendMessage(
+                    chatId,
+                    "📝 Введите описание:"
+                );
+
+            case "description":
+
+                console.log("DESCRIPTION =", text);
+
+                addExpense(
+                    chatId,
+                    states[chatId].category,
+                    states[chatId].amount,
+                    text
+                );
+
+                delete states[chatId];
+
+                return bot.sendMessage(
+                    chatId,
+                    "✅ Расход сохранён.",
+                    menu
+                );
+
+            default:
+
+                delete states[chatId];
+
+                return bot.sendMessage(
+                    chatId,
+                    "Произошла ошибка. Начните заново.",
+                    menu
+                );
+        }
+
+    });
+
 };
