@@ -1,1 +1,76 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Ворота</title>
+
+<style>
+
+body{
+
+font-family:Arial;
+background:#f5f5f5;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+height:100vh;
+
+}
+
+button{
+
+font-size:30px;
+padding:25px 60px;
+
+cursor:pointer;
+
+}
+
+#msg{
+
+margin-top:30px;
+font-size:24px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div align="center">
+
+<h1>🚪 Открытие ворот</h1>
+
+<button onclick="send()">Запросить открытие</button>
+
+<div id="msg"></div>
+
+</div>
+
+<script>
+
+async function send(){
+
+const r=await fetch("/request-open",{
+method:"POST"
+});
+
+const j=await r.json();
+
+document.getElementById("msg").innerHTML="✅ Запрос отправлен";
+
+}
+
+</script>
+
+</body>
+
+</html>
